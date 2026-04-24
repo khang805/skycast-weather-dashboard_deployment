@@ -4,7 +4,7 @@
    ============================================================ */
 
 // ── Config ──────────────────────────────────────────────────
-const BACKEND_URL = window.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = window.BACKEND_URL || 'http://98.92.253.225:30050';
 let isCelsius = true;
 let currentData = null;
 let searchTimeout = null;
