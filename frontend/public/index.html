@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Real-Time Weather Dashboard — Get live weather conditions, 7-day forecasts, and hourly trends for any city worldwide." />
+  <title>SkyCast — Real-Time Weather Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-clear" id="app-body">
+
+  <!-- Animated Background Layers -->
+  <div class="bg-gradient-layer" id="bg-gradient"></div>
+  <div class="bg-particles" id="bg-particles"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Main App -->
+  <div class="app-container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🌤️</span>
+        <span class="logo-text">SkyCast</span>
+      </div>
+      <div class="header-right">
+        <span class="unit-toggle-label">°C</span>
+        <label class="toggle-switch" title="Switch temperature unit">
+          <input type="checkbox" id="unit-toggle" />
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="unit-toggle-label">°F</span>
+        <div class="current-time" id="current-time"></div>
+      </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section" aria-label="City Search">
+      <div class="search-wrapper">
+        <div class="search-box" id="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="city-input"
+            placeholder="Search for a city..."
+            autocomplete="off"
+            aria-label="City name"
+          />
+          <button id="search-btn" class="search-btn" aria-label="Search">
+            <span>Search</span>
+          </button>
+        </div>
+        <div class="suggestions-dropdown" id="suggestions-dropdown" role="listbox" aria-label="City suggestions"></div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loading-text">Fetching weather data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-card" id="error-card" style="display:none">
+      <span class="error-icon">⚠️</span>
+      <h3 id="error-message">Something went wrong</h3>
+      <p>Please try searching for a different city.</p>
+    </div>
+
+    <!-- Main Weather Content -->
+    <main class="weather-content" id="weather-content" style="display:none">
+
+      <!-- Hero: Current Weather -->
+      <section class="current-weather-card glass-card" aria-label="Current Weather">
+        <div class="current-left">
+          <div class="city-info">
+            <h1 class="city-name" id="city-name">--</h1>
+            <p class="city-coords" id="city-coords"></p>
+          </div>
+          <div class="weather-icon-huge" id="weather-icon-main">☀️</div>
+          <div class="current-temp-block">
+            <div class="current-temp" id="current-temp">--</div>
+            <div class="current-desc" id="current-desc">Loading...</div>
+          </div>
+          <div class="feels-like">
+            Feels like <span id="feels-like">--</span>
+          </div>
+        </div>
+        <div class="current-right">
+          <div class="sun-info">
+            <div class="sun-item">
+              <span class="sun-emoji">🌅</span>
+              <div>
+                <div class="sun-label">Sunrise</div>
+                <div class="sun-val" id="sunrise">--</div>
+              </div>
+            </div>
+            <div class="sun-item">
+              <span class="sun-emoji">🌇</span>
+              <div>
+                <div class="sun-label">Sunset</div>
+                <div class="sun-val" id="sunset">--</div>
+              </div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card glass-card-inner" id="stat-humidity">
+              <div class="stat-icon">💧</div>
+              <div class="stat-value" id="humidity-val">--</div>
+              <div class="stat-label">Humidity</div>
+            </div>
+            <div class="stat-card glass-card-inner" id="stat-wind">
+              <div class="stat-icon">💨</div>
+              <div class="stat-value" id="wind-val">--</div>
+              <div class="stat-label">Wind</div>
+            </div>
+            <div class="stat-card glass-card-inner" id="stat-pressure">
+              <div class="stat-icon">🌡️</div>
+              <div class="stat-value" id="pressure-val">--</div>
+              <div class="stat-label">Pressure</div>
+            </div>
+            <div class="stat-card glass-card-inner" id="stat-visibility">
+              <div class="stat-icon">👁️</div>
+              <div class="stat-value" id="visibility-val">--</div>
+              <div class="stat-label">Visibility</div>
+            </div>
+            <div class="stat-card glass-card-inner" id="stat-cloud">
+              <div class="stat-icon">☁️</div>
+              <div class="stat-value" id="cloud-val">--</div>
+              <div class="stat-label">Cloud Cover</div>
+            </div>
+            <div class="stat-card glass-card-inner" id="stat-uv">
+              <div class="stat-icon">🔆</div>
+              <div class="stat-value" id="uv-val">--</div>
+              <div class="stat-label">UV Index</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hourly Forecast -->
+      <section class="section-block" aria-label="Hourly Forecast">
+        <h2 class="section-title">⏱️ 24-Hour Forecast</h2>
+        <div class="hourly-scroll" id="hourly-scroll">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- 7-Day Forecast -->
+      <section class="section-block" aria-label="7-Day Forecast">
+        <h2 class="section-title">📅 7-Day Forecast</h2>
+        <div class="daily-grid" id="daily-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Extra Details Row -->
+      <section class="section-block details-section" aria-label="Weather Details">
+        <h2 class="section-title">📊 Detailed Conditions</h2>
+        <div class="detail-cards-row">
+          <div class="detail-card glass-card">
+            <div class="detail-title">Wind</div>
+            <div class="wind-compass" id="wind-compass">
+              <div class="compass-ring">
+                <span class="compass-n">N</span>
+                <span class="compass-s">S</span>
+                <span class="compass-e">E</span>
+                <span class="compass-w">W</span>
+                <div class="compass-needle" id="compass-needle"></div>
+              </div>
+            </div>
+            <div class="detail-value" id="wind-detail">-- km/h</div>
+            <div class="detail-sub" id="wind-gusts">Gusts: --</div>
+          </div>
+          <div class="detail-card glass-card">
+            <div class="detail-title">Precipitation</div>
+            <div class="precip-bar-container">
+              <div class="precip-bar-bg">
+                <div class="precip-bar-fill" id="precip-bar-fill"></div>
+              </div>
+            </div>
+            <div class="detail-value" id="precip-val">-- mm</div>
+            <div class="detail-sub" id="precip-prob">Chance: --</div>
+          </div>
+          <div class="detail-card glass-card">
+            <div class="detail-title">UV Index</div>
+            <div class="uv-gauge-container">
+              <div class="uv-gauge-arc">
+                <div class="uv-gauge-needle" id="uv-needle"></div>
+              </div>
+              <div class="uv-label-inside" id="uv-category">Low</div>
+            </div>
+            <div class="detail-value" id="uv-detail">--</div>
+            <div class="detail-sub">UV Radiation Level</div>
+          </div>
+          <div class="detail-card glass-card">
+            <div class="detail-title">Humidity & Pressure</div>
+            <div class="hp-row">
+              <div class="hp-item">
+                <div class="hp-ring-wrap">
+                  <svg class="hp-ring" viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="24" class="ring-bg"/>
+                    <circle cx="30" cy="30" r="24" class="ring-fill" id="humidity-ring" stroke-dasharray="0 150"/>
+                  </svg>
+                  <span class="hp-center-val" id="hum-center">--%</span>
+                </div>
+                <div class="hp-label">Humidity</div>
+              </div>
+              <div class="hp-item">
+                <div class="hp-ring-wrap">
+                  <svg class="hp-ring" viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="24" class="ring-bg"/>
+                    <circle cx="30" cy="30" r="24" class="ring-fill ring-orange" id="pressure-ring" stroke-dasharray="0 150"/>
+                  </svg>
+                  <span class="hp-center-val" id="pres-center">--</span>
+                </div>
+                <div class="hp-label">Pressure hPa</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Powered by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> &amp; Open-Meteo Geocoding · No API key required · Data updates every 15 minutes</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

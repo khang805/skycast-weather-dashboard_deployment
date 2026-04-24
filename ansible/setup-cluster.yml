@@ -1,0 +1,48 @@
+---
+- name: Setup MicroK8s Kubernetes Cluster on EC2
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install dependencies
+      apt:
+        name:
+          - curl
+          - apt-transport-https
+          - software-properties-common
+        state: present
+
+    - name: Install MicroK8s (Snap)
+      snap:
+        name: microk8s
+        classic: yes
+
+    - name: Wait for MicroK8s to be ready
+      command: microk8s status --wait-ready
+      retries: 5
+      delay: 10
+
+    - name: Enable basic MicroK8s addons (dns, rbac)
+      command: microk8s enable dns rbac
+
+    - name: Create kubectl alias
+      command: snap alias microk8s.kubectl kubectl
+      ignore_errors: yes
+
+    - name: Ensure ubuntu user is in microk8s group
+      user:
+        name: ubuntu
+        groups: microk8s
+        append: yes
+
+    - name: Install ArgoCD (CRDs and components)
+      command: >
+        microk8s kubectl create namespace argocd
+      ignore_errors: yes
+
+    - name: Apply ArgoCD Manifests
+      command: >
+        microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
