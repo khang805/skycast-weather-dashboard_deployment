@@ -17,7 +17,7 @@ spec:
       containers:
         - name: backend
           # This image name will be automatically updated by GitHub Actions
-          image: abdurrahman1148/weather-backend:f72408c3da2ee751ae9abbc75016384c1c968cc4
+          image: abdurrahman1148/weather-backend:78902018c24a76f41076764c94e58e8aa16a2d2f
           ports:
             - containerPort: 5000
           env:
